@@ -1,0 +1,52 @@
+* {box-sizing: border-box;}
+
+
+#jogadores>span {
+    background-color: gray;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+}
+
+#jogadores> span > i {
+    margin-left: 20px
+}
+
+button:disabled {
+    background-color: blueviolet;
+    color: white;
+}
+
+
+
+.jogadorAtivo {
+    background-color: green !important;
+    transition: background-color 1s;
+}
+#jogadores {
+    margin-bottom: 20px;
+}
+
+#tabuleiro {
+    display:flex;
+    flex-wrap: wrap;
+    width: 400px;
+    height: 400px;
+    /* outline: solid 1px blueviolet */
+    box-shadow: 6px 6px 10px #555;
+}
+#tabuleiro>button {
+    flex-basis: 25%;
+    height: 100px;
+}
+
+button:hover {
+    background-color: rgba(138,43,226,.2);
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: whitesmoke;
+}
