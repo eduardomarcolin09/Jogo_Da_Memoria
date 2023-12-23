@@ -1,5 +1,7 @@
+let primeiroClique = true
+
 // Função para criar um tabuleiro de memória com pares de números
-const criarTabuleiro = (quantidadePares = 8) => {
+function criarTabuleiro(quantidadePares = 8) {
     if (quantidadePares % 2 === 1) {
         console.log("A quantidade de pares deve ser par!")
         return
@@ -30,18 +32,49 @@ let jogadorAtual = 0
 let jogadas = []
 let bloquearJogo = false
 
-// Elemento HTML para exibir jogadores
 const divJogadores = document.getElementById('jogadores')
+
+// Função para editar o nome do jogador
+function editarNomeJogador(indice) {
+    if (!primeiroClique) return
+
+    let novoNome = prompt('Digite o novo nome do jogador:')
+
+    // Verifica se o novo nome não está vazio ou contém apenas espaços em branco
+    while (novoNome !== null && novoNome.trim() === "") {
+        novoNome = prompt('O nome não pode estar vazio. Digite o novo nome do jogador:')
+    }
+
+    if (novoNome !== null) {
+        jogadores[indice] = novoNome
+        spansJogadores[indice].firstChild.nodeValue = novoNome
+    }
+}
+
+// Função pra desabilitar o botão de edição após o primeiro click no tabuleiro
+function desabilitarBotaoEdicao() {
+    const iconesEdicao = document.querySelectorAll('.fas.fa-pencil-alt')
+    iconesEdicao.forEach(iconeEdicao => {
+        iconeEdicao.remove()
+    })
+}
 
 // Inicialização dos jogadores
 jogadores.forEach((nomeJogador, index) => {
     const span = document.createElement('span')
     span.innerHTML = nomeJogador
-    
+
+    // Adiciona ícone de edição
+    const iconeEdicao = document.createElement('i')
+    iconeEdicao.id = 'iconeEdicao'
+    iconeEdicao.classList.add('fas', 'fa-pencil-alt')
+    iconeEdicao.addEventListener('click', () => editarNomeJogador(index))
+    span.appendChild(iconeEdicao)
+
     const placar = document.createElement('i')
     placar.innerHTML = '0'
     placares.push(placar)
-    
+
     span.appendChild(placar)
     divJogadores.appendChild(span)
 })
@@ -58,11 +91,15 @@ const divTabuleiro = document.getElementById('tabuleiro')
 tabuleiro.forEach(numero => {
     const botao = document.createElement('button')
     botao.setAttribute('type', 'button')
-    
+
     botao.addEventListener('click', () => {
         if (bloquearJogo) return
-
+        if (primeiroClique) {
+            desabilitarBotaoEdicao()
+            primeiroClique = false
+        }
         botao.innerHTML = numero
+
         
         // Evita clique duplo no mesmo botão
         if (jogadas.some(jogada => jogada === botao)) return
@@ -84,9 +121,9 @@ tabuleiro.forEach(numero => {
 
                 if (pontuacaoJogador1 + pontuacaoJogador2 === tabuleiro.length / 2) {
                     if (pontuacaoJogador1 > pontuacaoJogador2) {
-                        alert('Jogador 1 venceu')
+                        alert(jogadores[0] + ' Venceu!! Parabéns..')
                     } else if (pontuacaoJogador1 < pontuacaoJogador2) {
-                        alert('Jogador 2 venceu')
+                        alert(jogadores[1] + ' Venceu!! Parabéns..')
                     } else {
                         alert('O jogo terminou empatado!')
                     }
@@ -113,4 +150,3 @@ tabuleiro.forEach(numero => {
 
     divTabuleiro.appendChild(botao)
 })
-
