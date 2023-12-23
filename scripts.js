@@ -1,95 +1,116 @@
-const criarTabuleiro = (max = 16) => {
-    if (max % 2 == 1) {
-        console.log("O número tem que ser par!")
-        return;
-    }
-    const tab = []
-
-    let k = 0
-    while (k < max) {
-        const n = Math.ceil(Math.random() * (max / 2) )
-        if (tab.filter(x => x === n).length >= 2) continue
-    
-        tab.push(n)
-        k++
+// Função para criar um tabuleiro de memória com pares de números
+const criarTabuleiro = (quantidadePares = 8) => {
+    if (quantidadePares % 2 === 1) {
+        console.log("A quantidade de pares deve ser par!")
+        return
     }
 
-    return tab
+    const tabuleiro = []
+
+    let contador = 0
+    while (contador < quantidadePares * 2) {
+        const numeroAleatorio = Math.ceil(Math.random() * quantidadePares)
+        
+        // Garante que cada número aparece no máximo duas vezes no tabuleiro
+        if (tabuleiro.filter(x => x === numeroAleatorio).length >= 2) {
+            continue
+        }
+
+        tabuleiro.push(numeroAleatorio)
+        contador++
+    }
+
+    return tabuleiro
 }
 
-
+// Definição de jogadores
 const jogadores = ['Jogador 1', 'Jogador 2']
-const spans = []
-let jogador = 0 
+const placares = []
+let jogadorAtual = 0
 let jogadas = []
-let placar = []
-let trancarJogo = false
+let bloquearJogo = false
 
-const divJ = document.getElementById('jogadores')
-jogadores.forEach(j => {
+// Elemento HTML para exibir jogadores
+const divJogadores = document.getElementById('jogadores')
+
+// Inicialização dos jogadores
+jogadores.forEach((nomeJogador, index) => {
     const span = document.createElement('span')
-    span.innerHTML = j
-    const i = document.createElement('I')
-    i.innerHTML = '0'
-    placar.push(i)
-    span.appendChild(i)
-    divJ.appendChild(span)
-    spans.push(span)
+    span.innerHTML = nomeJogador
+    
+    const placar = document.createElement('i')
+    placar.innerHTML = '0'
+    placares.push(placar)
+    
+    span.appendChild(placar)
+    divJogadores.appendChild(span)
 })
 
+// Adição de classe para indicar o jogador ativo
+const spansJogadores = Array.from(divJogadores.children)
+spansJogadores[jogadorAtual].classList.add('jogadorAtivo')
 
-spans[jogador].classList.add('jogadorAtivo')
 
+// Criação do tabuleiro e vinculação ao elemento HTML
+const tabuleiro = criarTabuleiro()
+const divTabuleiro = document.getElementById('tabuleiro')
 
-const tab = criarTabuleiro()
-const div = document.getElementById('tabuleiro')
-tab.forEach(n => {
-    const btn = document.createElement('button')
-    btn.setAttribute('type', 'button')
-    btn.addEventListener('click', () => {
-        if (trancarJogo) return;
+tabuleiro.forEach(numero => {
+    const botao = document.createElement('button')
+    botao.setAttribute('type', 'button')
+    
+    botao.addEventListener('click', () => {
+        if (bloquearJogo) return
 
-        btn.innerHTML = n 
-        if (jogadas.some(j => j === btn)) return;
-        jogadas.push(btn)
+        botao.innerHTML = numero
         
-        if (jogadas.length === 2) { 
-            trancarJogo = true
+        // Evita clique duplo no mesmo botão
+        if (jogadas.some(jogada => jogada === botao)) return
+        jogadas.push(botao)
 
-            if (jogadas[0].innerHTML === jogadas[1].innerHTML){
-                placar[jogador].innerHTML = parseInt(placar[jogador].innerHTML)+1
+        if (jogadas.length === 2) {
+            bloquearJogo = true
+
+            if (jogadas[0].innerHTML === jogadas[1].innerHTML) {
+                // Pontuação e desativação de botões em caso de acerto
+                placares[jogadorAtual].innerHTML = parseInt(placares[jogadorAtual].innerHTML) + 1
                 jogadas[0].disabled = true
                 jogadas[1].disabled = true
-                trancarJogo = false
+                bloquearJogo = false
 
-                const p1 = parseInt(placar[0].innerHTML)
-                const p2 = parseInt(placar[1].innerHTML)
+                // Verificação de fim de jogo
+                const pontuacaoJogador1 = parseInt(placares[0].innerHTML)
+                const pontuacaoJogador2 = parseInt(placares[1].innerHTML)
 
-                if (p1 + p2 === 8) {
-                    if (p1 > p2) {
+                if (pontuacaoJogador1 + pontuacaoJogador2 === tabuleiro.length / 2) {
+                    if (pontuacaoJogador1 > pontuacaoJogador2) {
                         alert('Jogador 1 venceu')
-                    }else if (p1 < p2) {
+                    } else if (pontuacaoJogador1 < pontuacaoJogador2) {
                         alert('Jogador 2 venceu')
-                    }else {
+                    } else {
                         alert('O jogo terminou empatado!')
                     }
                 }
 
                 console.log('Você acertou!')
                 jogadas = []
-            }else{    
+            } else {
+                // Tratamento de erro e troca de jogador em caso de erro
                 console.log('Você errou!')
-                jogador = (jogador + 1) % jogadores.length
-                spans.forEach(s => s.classList.remove('jogadorAtivo'))
-                spans[jogador].classList.add('jogadorAtivo')
+                jogadorAtual = (jogadorAtual + 1) % jogadores.length
+                spansJogadores.forEach(span => span.classList.remove('jogadorAtivo'))
+                spansJogadores[jogadorAtual].classList.add('jogadorAtivo')
+
+                // Limpa os botões após um intervalo
                 setTimeout(() => {
-                    jogadas.forEach(b => b.innerHTML = "")
+                    jogadas.forEach(botao => botao.innerHTML = "")
                     jogadas = []
-                    trancarJogo = false
+                    bloquearJogo = false
                 }, 1000)
             }
-            
         }
     })
-    div.appendChild(btn)
+
+    divTabuleiro.appendChild(botao)
 })
+
