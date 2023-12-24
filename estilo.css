@@ -1,6 +1,10 @@
 * {box-sizing: border-box;}
 
 
+#jogadores {
+    margin-top: 10px;
+}
+
 #jogadores>span {
     background-color: gray;
     color: white;
@@ -16,8 +20,6 @@ button:disabled {
     background-color: blueviolet;
     color: white;
 }
-
-
 
 .jogadorAtivo {
     background-color: green !important;
@@ -49,4 +51,8 @@ body {
     align-items: center;
     flex-direction: column;
     background-color: whitesmoke;
+}
+
+.escondido {
+    display: none;
 }
