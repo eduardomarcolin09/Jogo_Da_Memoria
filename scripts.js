@@ -26,7 +26,7 @@ function criarTabuleiro(quantidadePares = 8) {
 }
 
 // Definição de jogadores
-const jogadores = ['Jogador 1', 'Jogador 2']
+let jogadores = ['Jogador 1', 'Jogador 2']
 const placares = []
 let jogadorAtual = 0
 let jogadas = []
@@ -55,7 +55,7 @@ function editarNomeJogador(indice) {
 function desabilitarBotaoEdicao() {
     const iconesEdicao = document.querySelectorAll('.fas.fa-pencil-alt')
     iconesEdicao.forEach(iconeEdicao => {
-        iconeEdicao.remove()
+        iconeEdicao.style.display = 'none'
     })
 }
 
@@ -100,14 +100,12 @@ tabuleiro.forEach(numero => {
         }
         botao.innerHTML = numero
 
-        
         // Evita clique duplo no mesmo botão
         if (jogadas.some(jogada => jogada === botao)) return
         jogadas.push(botao)
 
         if (jogadas.length === 2) {
             bloquearJogo = true
-
             if (jogadas[0].innerHTML === jogadas[1].innerHTML) {
                 // Pontuação e desativação de botões em caso de acerto
                 placares[jogadorAtual].innerHTML = parseInt(placares[jogadorAtual].innerHTML) + 1
@@ -122,13 +120,21 @@ tabuleiro.forEach(numero => {
                 if (pontuacaoJogador1 + pontuacaoJogador2 === tabuleiro.length / 2) {
                     if (pontuacaoJogador1 > pontuacaoJogador2) {
                         alert(jogadores[0] + ' Venceu!! Parabéns..')
+                        setTimeout(function () {
+                            reiniciarJogo()
+                        }, 3000)
                     } else if (pontuacaoJogador1 < pontuacaoJogador2) {
                         alert(jogadores[1] + ' Venceu!! Parabéns..')
+                        setTimeout(function () {
+                            reiniciarJogo()
+                        }, 3000)
                     } else {
                         alert('O jogo terminou empatado!')
+                        setTimeout(function () {
+                            reiniciarJogo()
+                        }, 3000)
                     }
                 }
-
                 console.log('Você acertou!')
                 jogadas = []
             } else {
@@ -147,6 +153,40 @@ tabuleiro.forEach(numero => {
             }
         }
     })
-
     divTabuleiro.appendChild(botao)
 })
+
+// Função pra reiniciar feita do jeito mais preguiçoso possível, ainda vou mudar isso
+function reiniciarJogo() {
+    // Resetar variáveis e o placar no HTML
+    jogadorAtual = 0
+    jogadas = []
+    jogadores = ['Jogador 1', 'Jogador 2']
+    bloquearJogo = false
+    primeiroClique = true
+    placares.forEach(placar => {
+        placar.innerHTML = '0'
+    })
+
+    // Atualizar nomes dos jogadores no HTML
+    spansJogadores.forEach((span, index) => {
+        span.firstChild.nodeValue = jogadores[index]
+    })
+
+    // Remover ícones de edição / classes 
+    const iconesEdicao = document.querySelectorAll('.fas.fa-pencil-alt')
+    iconesEdicao.forEach(iconeEdicao => {
+        iconeEdicao.style.display = 'inline'
+    })
+    spansJogadores.forEach(span => span.classList.remove('jogadorAtivo'))
+
+    // Adicionar classe de jogador ativo ao primeiro jogador
+    spansJogadores[jogadorAtual].classList.add('jogadorAtivo')
+
+    // Limpar o tabuleiro
+    const botoesTabuleiro = document.querySelectorAll('#tabuleiro button')
+    botoesTabuleiro.forEach(botao => {
+        botao.innerHTML = ''
+        botao.disabled = false
+    })
+}
